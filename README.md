@@ -96,3 +96,18 @@ Nest is an MIT-licensed open source project. It can grow thanks to the sponsors 
 ## License
 
 Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+
+## Deploy
+
+docker build -t gcr.io/ev-charging-454112/ev-charging-backend .
+
+docker push gcr.io/ev-charging-454112/ev-charging-backend
+
+gcloud run deploy ev-charging-backend \
+ --image gcr.io/ev-charging-454112/ev-charging-backend \
+ --platform managed \
+ --region us-central1 \
+ --allow-unauthenticated \
+ --port 8080
+
+https://ev-charging-backend-275345050683.us-central1.run.app

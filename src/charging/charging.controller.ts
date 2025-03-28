@@ -1,31 +1,39 @@
-import { Controller, Post, Body } from '@nestjs/common';
-import { OcppGateway } from '../ocpp/ocpp.gateway';
+import { Controller, Post, Body, Param, Get } from '@nestjs/common';
+import { OcppGateway } from 'src/ocpp/ocpp.gateway';
 
 @Controller('charging')
 export class ChargingController {
-  constructor(private readonly ocppGateway: OcppGateway) {} // Inject WebSocket Gateway
+  constructor(private readonly ocppGateway: OcppGateway) {}
 
-  @Post('start')
-  startCharging(@Body() data: { idTag: string }) {
+  @Post(':id/start')
+  startCharging(@Param('id') id: string, @Body() data: { idTag: string }) {
     const command = JSON.stringify([
-      '2',
-      '12345',
+      2,
+      'start_' + Date.now(),
       'RemoteStartTransaction',
       { idTag: data.idTag },
     ]);
-    this.ocppGateway.sendMessageToCharger(command);
-    return { message: 'Start command sent' };
+    this.ocppGateway.sendMessageToCharger(command, id);
+    return { message: `Start command sent to ${id}` };
   }
 
-  @Post('stop')
-  stopCharging(@Body() data: { transactionId: string }) {
+  @Post(':id/stop')
+  stopCharging(
+    @Param('id') id: string,
+    @Body() data: { transactionId: string },
+  ) {
     const command = JSON.stringify([
-      '2',
-      '12346',
+      2,
+      'stop_' + Date.now(),
       'RemoteStopTransaction',
       { transactionId: data.transactionId },
     ]);
-    this.ocppGateway.sendMessageToCharger(command);
-    return { message: 'Stop command sent' };
+    this.ocppGateway.sendMessageToCharger(command, id);
+    return { message: `Stop command sent to ${id}` };
+  }
+
+  @Get(':id/status')
+  getStatus(@Param('id') id: string) {
+    return this.ocppGateway.getStatusForCharger(id);
   }
 }

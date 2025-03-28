@@ -1,15 +1,29 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import { WsAdapter } from '@nestjs/platform-ws';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  // CORS config for frontend/dev environments
   app.enableCors({
-    origin: '*', // Allow requests from any origin
+    origin: '*',
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     allowedHeaders: 'Content-Type, Accept',
   });
-  const port = process.env.PORT || 3000;
+
+  // Explicitly use WS adapter
+  app.useWebSocketAdapter(new WsAdapter(app));
+
+  // ✅ Log incoming requests to /ocpp (WebSocket upgrade attempts)
+  app.use('/ocpp', (req, res, next) => {
+    console.log(`📡 HTTP request to /ocpp from ${req.ip}`);
+    next();
+  });
+
+  const port = process.env.PORT || 8080;
   await app.listen(port);
   console.log(`🚀 Server running on port ${port}`);
 }
+
 bootstrap();
