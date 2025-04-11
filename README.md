@@ -99,6 +99,10 @@ Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
 
 ## Deploy
 
+gcloud auth login
+
+gcloud config set project ev-charging-454112
+
 docker build -t gcr.io/ev-charging-454112/ev-charging-backend .
 
 docker push gcr.io/ev-charging-454112/ev-charging-backend
